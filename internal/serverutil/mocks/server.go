@@ -85,7 +85,7 @@ func (s *TestServer) ListenRetryAndServe(retries int, retryAfter time.Duration) 
 	time.Sleep(200 * time.Millisecond)
 
 	s.srv = &http.Server{
-		Addr: fmt.Sprintf("127.0.0.1:%d", s.WantPort),
+		Addr: fmt.Sprintf("0.0.0.0:%d", s.WantPort),
 	}
 
 	err := s.srv.ListenAndServe()

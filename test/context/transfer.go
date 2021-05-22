@@ -89,7 +89,7 @@ func (ctx *TestContext) GetTransferRemoteIMAPServer() *mocks.IMAPServer {
 	}
 
 	port := 21300 + rand.Intn(100) //nolint[gosec] It is OK to use weaker rand generator here
-	ctx.transferRemoteIMAPServer = mocks.NewIMAPServer("user", "pass", "127.0.0.1", strconv.Itoa(port))
+	ctx.transferRemoteIMAPServer = mocks.NewIMAPServer("user", "pass", "0.0.0.0", strconv.Itoa(port))
 
 	ctx.transferRemoteIMAPServer.Start()
 	ctx.addCleanupChecked(func() error {

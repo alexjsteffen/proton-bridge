@@ -1,0 +1,30 @@
+make: Entering directory `/Users/alexsteffen/Documents/GitHub/proton-bridge'
+which go || (echo "Install Go-lang!" && exit 1)
+ 
+cd ./utils/ && ./credits.sh bridge
+cd ./utils/ && ./credits.sh importexport
+git clone https://github.com/therecipe/env_darwin_amd64_513.git vendor-cache/github.com/therecipe/env_darwin_amd64_513
+if [ "darwin" == "darwin" ]; then cp -f "./utils/QTBUG-88600/libqcocoa.dylib" "./vendor-cache/github.com/therecipe/env_darwin_amd64_513/5.13.0/clang_64/plugins/platforms/"; fi;
+go install -v -tags=no_env github.com/therecipe/qt/cmd/...
+go mod vendor
+ln -sf /Users/alexsteffen/Documents/GitHub/proton-bridge/vendor-cache/github.com/therecipe/env_darwin_amd64_513 vendor/github.com/therecipe/env_darwin_amd64_513
+rm -rf deploy darwin cmd/Desktop-Bridge/deploy
+cp cmd/Desktop-Bridge/main.go .
+qtdeploy -tags=' build_qt' -ldflags '-X github.com/ProtonMail/proton-bridge/internal/constants.Version=1.8.1+git -X github.com/ProtonMail/proton-bridge/internal/constants.Revision=4072205709 -X github.com/ProtonMail/proton-bridge/internal/constants.BuildTime=2021-05-21T17:21:08-0700' build desktop
+mv deploy cmd/Desktop-Bridge
+if [ "cmd/Desktop-Bridge/deploy/darwin/proton-bridge.app" != "cmd/Desktop-Bridge/deploy/darwin/proton-bridge.app" ]; then mv cmd/Desktop-Bridge/deploy/darwin/proton-bridge.app cmd/Desktop-Bridge/deploy/darwin/proton-bridge.app; fi
+rm -rf darwin main.go
+if [ "proton-bridge" != "proton-bridge" ]; then \
+		mv cmd/Desktop-Bridge/deploy/darwin/proton-bridge.app/Contents/MacOS/{proton-bridge,proton-bridge}; \
+		perl -i -pe"s/>proton-bridge/>proton-bridge/g" cmd/Desktop-Bridge/deploy/darwin/proton-bridge.app/Contents/Info.plist; \
+	fi
+cp ./internal/frontend/share/icons/Bridge.icns cmd/Desktop-Bridge/deploy/darwin/proton-bridge.app/Contents/Resources/Bridge.icns
+cp LICENSE cmd/Desktop-Bridge/deploy/darwin/proton-bridge.app/Contents/Resources/
+rm -rf "cmd/Desktop-Bridge/deploy/darwin/proton-bridge.app/Contents/Frameworks/QtWebEngine.framework"
+rm -rf "cmd/Desktop-Bridge/deploy/darwin/proton-bridge.app/Contents/Frameworks/QtWebView.framework"
+rm -rf "cmd/Desktop-Bridge/deploy/darwin/proton-bridge.app/Contents/Frameworks/QtWebEngineCore.framework"
+./utils/remove_non_relative_links_darwin.sh "cmd/Desktop-Bridge/deploy/darwin/proton-bridge.app/Contents/MacOS/proton-bridge"
+rm -f bridge_darwin_4072205709.tgz
+cd cmd/Desktop-Bridge/deploy/darwin && tar czf ../../../../bridge_darwin_4072205709.tgz .
+make: Leaving directory `/Users/alexsteffen/Documents/GitHub/proton-bridge'
+ 
