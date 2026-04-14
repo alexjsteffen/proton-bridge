@@ -67,7 +67,11 @@ void GRPCServerWorker::run() {
             builder.AddListeningPort(QString("unix://%1").arg(fileSocketPath).toStdString(), credentials);
             config.fileSocketPath = fileSocketPath;
         } else {
-            builder.AddListeningPort(QString(qEnvironmentVariable("BRIDGE_BIND_HOST", "127.0.0.1") + ":0").toStdString(), credentials, &port);
+            QString bindHost = qEnvironmentVariable("BRIDGE_BIND_HOST", "127.0.0.1");
+            if (bindHost.contains(':') && !bindHost.startsWith('[') && !bindHost.endsWith(']')) {
+                bindHost = QString("[%1]").arg(bindHost);
+            }
+            builder.AddListeningPort(QString("%1:0").arg(bindHost).toStdString(), credentials, &port);
         }
 
         builder.RegisterService(&app().grpc());
