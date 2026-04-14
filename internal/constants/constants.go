@@ -20,6 +20,7 @@ package constants
 
 import (
 	"fmt"
+	"os"
 	"runtime"
 
 	"github.com/ProtonMail/proton-bridge/v3/internal/platform"
@@ -66,9 +67,6 @@ const (
 
 	// KeyChainName is the name of the entry in the OS keychain.
 	KeyChainName = "bridge-v3"
-
-	// Host is the hostname of the bridge server.
-	Host = "127.0.0.1"
 )
 
 // nolint:goconst
@@ -85,5 +83,20 @@ func getAPIOS() string {
 
 	default:
 		return "linux"
+	}
+}
+
+// Host is the hostname of the bridge server.
+var Host = "127.0.0.1"
+
+// CustomDomain is the custom domain name of the bridge server.
+var CustomDomain = ""
+
+func init() {
+	if bindHost := os.Getenv("BRIDGE_BIND_HOST"); bindHost != "" {
+		Host = bindHost
+	}
+	if customDomain := os.Getenv("BRIDGE_CUSTOM_DOMAIN"); customDomain != "" {
+		CustomDomain = customDomain
 	}
 }

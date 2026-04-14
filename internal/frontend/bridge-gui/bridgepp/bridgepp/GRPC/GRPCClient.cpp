@@ -38,6 +38,27 @@ qint64 const grpcConnectionWaitTimeoutMs = 60000; ///< Timeout for the connectio
 qint64 const grpcConnectionRetryDelayMs = 10000; ///< Retry delay for the gRPC connection in milliseconds.
 
 
+QString grpcClientConnectHost(QString host) {
+    host = host.trimmed();
+    if (host.isEmpty() || host == "0.0.0.0") {
+        return "127.0.0.1";
+    }
+    if (host == "::" || host == "[::]") {
+        return "::1";
+    }
+    return host;
+}
+
+
+QString grpcAddressForHostPort(QString const &host, int port) {
+    QString formattedHost = host;
+    if (formattedHost.contains(':') && !(formattedHost.startsWith('[') && formattedHost.endsWith(']'))) {
+        formattedHost = QString("[%1]").arg(formattedHost);
+    }
+    return QString("%1:%2").arg(formattedHost).arg(port);
+}
+
+
 } // anonymous namespace
 
 
@@ -124,12 +145,13 @@ void GRPCClient::connectToServer(QString const &sessionID, QString const &config
     try {
         serverToken_ = config.token.toStdString();
         QString address;
+        QString const clientConnectHost = grpcClientConnectHost(qEnvironmentVariable("BRIDGE_BIND_HOST", "127.0.0.1"));
         grpc::ChannelArguments chanArgs;
         if (useFileSocketForGRPC()) {
             address = QString("unix://" + config.fileSocketPath);
-            chanArgs.SetSslTargetNameOverride("127.0.0.1"); // for file socket, we skip name verification to avoid a confusion localhost/127.0.0.1
+            chanArgs.SetSslTargetNameOverride(clientConnectHost.toStdString().c_str()); // for file socket, we skip name verification to avoid a confusion localhost/127.0.0.1
         } else {
-            address = QString("127.0.0.1:%1").arg(config.port);
+            address = grpcAddressForHostPort(clientConnectHost, config.port);
         }
 
         SslCredentialsOptions opts;

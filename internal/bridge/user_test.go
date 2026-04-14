@@ -28,6 +28,7 @@ import (
 	"github.com/ProtonMail/go-proton-api"
 	"github.com/ProtonMail/go-proton-api/server"
 	"github.com/ProtonMail/proton-bridge/v3/internal/bridge"
+	"github.com/ProtonMail/proton-bridge/v3/internal/constants"
 	"github.com/ProtonMail/proton-bridge/v3/internal/events"
 	"github.com/ProtonMail/proton-bridge/v3/internal/vault"
 	"github.com/stretchr/testify/require"
@@ -62,7 +63,7 @@ func TestBridge_Login(t *testing.T) {
 }
 
 func TestBridge_Login_DropConn(t *testing.T) {
-	l, err := net.Listen("tcp", "127.0.0.1:0")
+	l, err := net.Listen("tcp", net.JoinHostPort(constants.Host, "0"))
 	require.NoError(t, err)
 
 	dropListener := proton.NewListener(l, proton.NewDropConn)

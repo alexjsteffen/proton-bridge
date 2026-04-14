@@ -37,6 +37,7 @@ import (
 	"github.com/ProtonMail/go-proton-api"
 	"github.com/ProtonMail/proton-bridge/v3/internal/bridge"
 	"github.com/ProtonMail/proton-bridge/v3/internal/certs"
+	"github.com/ProtonMail/proton-bridge/v3/internal/constants"
 	"github.com/ProtonMail/proton-bridge/v3/internal/events"
 	"github.com/ProtonMail/proton-bridge/v3/internal/frontend/grpc/fido"
 	"github.com/ProtonMail/proton-bridge/v3/internal/hv"
@@ -141,7 +142,7 @@ func NewService(
 		}
 	} else {
 		var err error
-		listener, err = net.Listen("tcp", "127.0.0.1:0") // Port should be provided by the OS.
+		listener, err = net.Listen("tcp", net.JoinHostPort(constants.Host, "0")) // Port should be provided by the OS.
 		if err != nil {
 			logrus.WithError(err).Panic("Could not create gRPC listener")
 		}
