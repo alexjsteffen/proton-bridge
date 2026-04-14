@@ -30,6 +30,8 @@ import (
 	"net"
 	"time"
 
+	"github.com/ProtonMail/proton-bridge/v3/internal/constants"
+
 	"github.com/pkg/errors"
 )
 
@@ -49,13 +51,14 @@ func NewTLSTemplate() (*x509.Certificate, error) {
 			Country:            []string{"CH"},
 			Organization:       []string{"Proton AG"},
 			OrganizationalUnit: []string{"Proton Mail"},
-			CommonName:         "127.0.0.1",
+			CommonName:         getCommonName(),
 		},
 		KeyUsage:              x509.KeyUsageKeyEncipherment | x509.KeyUsageDigitalSignature | x509.KeyUsageCertSign,
 		ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth, x509.ExtKeyUsageClientAuth},
 		BasicConstraintsValid: true,
 		IsCA:                  true,
-		IPAddresses:           []net.IP{net.ParseIP("127.0.0.1")},
+		IPAddresses:           []net.IP{net.ParseIP(constants.Host)},
+		DNSNames:              getDNSNames(),
 		NotBefore:             time.Now(),
 		NotAfter:              time.Now().Add(20 * 365 * 24 * time.Hour),
 	}, nil
@@ -110,9 +113,23 @@ func GetConfig(certPEM, keyPEM []byte) (*tls.Config, error) {
 	//nolint:gosec  // We need to support older TLS versions for AppleMail and Outlook
 	return &tls.Config{
 		Certificates: []tls.Certificate{c},
-		ServerName:   "127.0.0.1",
+		ServerName:   getCommonName(),
 		ClientAuth:   tls.VerifyClientCertIfGiven,
 		RootCAs:      caCertPool,
 		ClientCAs:    caCertPool,
 	}, nil
+}
+
+func getCommonName() string {
+	if constants.CustomDomain != "" {
+		return constants.CustomDomain
+	}
+	return constants.Host
+}
+
+func getDNSNames() []string {
+	if constants.CustomDomain != "" {
+		return []string{constants.CustomDomain}
+	}
+	return nil
 }

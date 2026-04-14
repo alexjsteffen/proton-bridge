@@ -67,7 +67,7 @@ void GRPCServerWorker::run() {
             builder.AddListeningPort(QString("unix://%1").arg(fileSocketPath).toStdString(), credentials);
             config.fileSocketPath = fileSocketPath;
         } else {
-            builder.AddListeningPort("127.0.0.1:0", credentials, &port);
+            builder.AddListeningPort(QString(qEnvironmentVariable("BRIDGE_BIND_HOST", "127.0.0.1") + ":0").toStdString(), credentials, &port);
         }
 
         builder.RegisterService(&app().grpc());

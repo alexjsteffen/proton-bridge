@@ -20,6 +20,7 @@ package bridge
 import (
 	"context"
 	"fmt"
+	"github.com/ProtonMail/proton-bridge/v3/internal/constants"
 	"io"
 	"os"
 	"path/filepath"
@@ -95,7 +96,7 @@ func (bridge *Bridge) CheckClientState(ctx context.Context, checkFlags bool, pro
 			return result, err
 		}
 
-		addr := fmt.Sprintf("127.0.0.1:%v", bridge.GetIMAPPort())
+		addr := fmt.Sprintf(constants.Host+":%v", bridge.GetIMAPPort())
 
 		for account, mboxMap := range state {
 			if progressCB != nil {

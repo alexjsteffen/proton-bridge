@@ -63,6 +63,13 @@ func newSyncLimits(maxSyncMemory uint64) syncLimits {
 		MaxSyncMemory: maxSyncMemory,
 	}
 
+	if _, ok := os.LookupEnv("BRIDGE_SYNC_FULL_CACHE"); ok {
+		logrus.Warn("Sync full cache enabled")
+		limits.MaxDownloadRequestMem = limits.MaxSyncMemory
+		limits.MaxMessageBuildingMem = limits.MaxSyncMemory
+		limits.MaxParallelDownloads = 32
+	}
+
 	if _, ok := os.LookupEnv("BRIDGE_SYNC_FORCE_MINIMUM_SPEC"); ok {
 		logrus.Warn("Sync specs forced to minimum")
 		limits.MaxDownloadRequestMem = 50 * Megabyte
