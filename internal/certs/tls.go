@@ -45,6 +45,8 @@ func NewTLSTemplate() (*x509.Certificate, error) {
 		return nil, errors.Wrap(err, "failed to generate serial number")
 	}
 
+	ipAddresses, dnsNames := getSubjectAltNames()
+
 	return &x509.Certificate{
 		SerialNumber: serialNumber,
 		Subject: pkix.Name{
@@ -57,8 +59,8 @@ func NewTLSTemplate() (*x509.Certificate, error) {
 		ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth, x509.ExtKeyUsageClientAuth},
 		BasicConstraintsValid: true,
 		IsCA:                  true,
-		IPAddresses:           []net.IP{net.ParseIP(constants.Host)},
-		DNSNames:              getDNSNames(),
+		IPAddresses:           ipAddresses,
+		DNSNames:              dnsNames,
 		NotBefore:             time.Now(),
 		NotAfter:              time.Now().Add(20 * 365 * 24 * time.Hour),
 	}, nil
@@ -127,9 +129,23 @@ func getCommonName() string {
 	return constants.Host
 }
 
-func getDNSNames() []string {
+func getSubjectAltNames() ([]net.IP, []string) {
 	if constants.CustomDomain != "" {
-		return []string{constants.CustomDomain}
+		return nil, []string{constants.CustomDomain}
 	}
-	return nil
+
+	if ip := net.ParseIP(constants.Host); ip != nil {
+		return []net.IP{ip}, nil
+	}
+
+	if constants.Host != "" {
+		return nil, []string{constants.Host}
+	}
+
+	return nil, nil
+}
+
+func getDNSNames() []string {
+	_, dnsNames := getSubjectAltNames()
+	return dnsNames
 }
