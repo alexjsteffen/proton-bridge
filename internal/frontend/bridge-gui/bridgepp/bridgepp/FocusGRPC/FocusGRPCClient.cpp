@@ -28,8 +28,17 @@ using namespace google::protobuf;
 namespace {
 
 
+QString focusClientHostname() {
+    auto const host = qEnvironmentVariable("BRIDGE_BIND_HOST", "127.0.0.1");
+    if ((host == "0.0.0.0") || (host == "::")) {
+        return "127.0.0.1";
+    }
+
+    return host;
+}
+
 Empty empty; ///< Empty protobuf message, re-used across calls.
-QString const hostname = qEnvironmentVariable("BRIDGE_BIND_HOST", "127.0.0.1"); ///< The hostname of the focus service.
+QString const hostname = focusClientHostname(); ///< The hostname of the focus service.
 
 
 }
